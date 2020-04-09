@@ -243,3 +243,220 @@ function checkSchedule(event) {
   console.log(event.dataset.dayAndTime, eventName)
 
 }
+
+
+
+
+
+
+/*                                     HIDE PAYMENT OPTIONS                            */
+
+
+
+
+
+// make variables for the payment sections
+
+const paypal  = document.getElementById('paypal');
+
+const bitcoin = document.getElementById('bitcoin');
+
+const creditCard = document.getElementById('credit-card');
+
+// initialize the display to block for validation purposes
+creditCard.style.display = "block";
+
+// initially hide the bitcoin and paypal options
+bitcoin.style.display = "none";
+paypal.style.display = "none";
+
+
+// add an event listener to payment select <option>
+
+const payment = document.getElementById('payment');
+
+payment.addEventListener('change', (event) => {
+  if (event.target.value === "credit card" || event.target.value === "select method") {
+    paypal.style.display = "none";
+    bitcoin.style.display = "none"
+    creditCard.style.display = "block";
+  }
+  else if (event.target.value === "paypal") {
+    creditCard.style.display = "none";
+    bitcoin.style.display = "none";
+    paypal.style.display = "block";
+  }
+  else {
+    creditCard.style.display = "none";
+    paypal.style.display = "none";
+    bitcoin.style.display = "block";
+  }
+});
+
+
+
+// make the window refresh after submitting
+
+
+const submitButton = document.querySelector('button');
+
+submitButton.addEventListener('click', (e) => {
+  // prevent the form submission
+  e.preventDefault();
+  if (creditCard.style.display === "block") {
+    
+      if (fieldsValidate()) {
+
+    
+    // just reload the page like specifications say
+    window.location.reload();
+    }
+    else {
+      warningValidate();
+    }
+  }
+    else {
+      if (validateEmail(mailInput.value) &&validateName(nameInput.value)) {
+        window.location.reload();
+      }
+      else {
+        createRedBorder(validateEmail, mailInput);
+        createRedBorder(validateName, nameInput);
+      }
+    }
+});
+
+
+// make function fieldsValidate()
+
+function fieldsValidate() {
+
+
+  if (validateEmail(mailInput.value) && validateName(nameInput.value)
+  && validateCVV(cvvInput.value)
+  && validateCreditNum(creditCardInput.value)
+  && validateZip(zipInput.value)
+  && validateActivities(activities)) {
+    return true
+  }
+  return false
+}
+
+// make function warningValidate();
+function warningValidate() {
+  // call function to test each input and make border red
+  // a visual cue to make sure customers fill in the field.
+  createRedBorder(validateCVV, cvvInput);
+  createRedBorder(validateCreditNum, creditCardInput);
+  createRedBorder(validateEmail, mailInput);
+  createRedBorder(validateName, nameInput);
+  createRedBorder(validateZip, zipInput);
+  scheduleRedBorder(validateActivities, activities, schedule)
+ 
+
+}
+// function to create red border
+// if they don't pass validation test.
+
+// create a function to validate the schedule
+function scheduleRedBorder(callback, list, element) {
+  if (! callback(list)) {
+    element.style.border = "3px solid red";
+  }
+}
+
+function createRedBorder(callback, input) {
+  if (! callback(input.value)) {
+    input.style.border = "3px solid red";
+  }
+}
+
+
+
+
+/*                                    VALIDATE FIELDS                            */
+
+// I pulled this off of stack overflow as a VERY lenient way to check emails
+// it makes anything but whitespace then @ . anything but whitespace
+function validateEmail (email) {
+  return /\S+@\S+\.\S+/.test(email)
+}
+
+// make sure name isn't blank
+function validateName (name) {
+  return /\S+/.test(name)
+}
+// to validate check all the fields.
+//
+function validateCreditNum (creditNum) {
+  return /^[0-9]{13,16}$/.test(creditNum)
+}
+
+
+function validateZip (zip) {
+  return /^[0-9]{5}$/.test(zip)
+}
+
+
+function validateCVV (cvv) {
+  return /^[0-9]{3}$/.test(cvv)
+}
+
+
+// add event listeners to all the fields that need validated
+// first hook them
+
+const creditCardInput = document.getElementById("cc-num");
+
+const cvvInput = document.getElementById("cvv")
+
+const nameInput = document.getElementById("name")
+
+const mailInput = document.getElementById("mail")
+
+const zipInput = document.getElementById("zip")
+
+// if the border is red due to form validation 
+// check on every keyup to see it it is now valid to let
+// the user know they did good
+
+function addValidationEvent(theInput, theFunction) {
+  theInput.addEventListener("keyup", () => {
+    if (theInput.style.border === "3px solid red" 
+    && theFunction(theInput.value)) {
+      theInput.style.border = "";
+    }
+  });
+}
+
+addValidationEvent(zipInput, validateZip);
+
+addValidationEvent(mailInput, validateEmail);
+
+addValidationEvent(cvvInput, validateCVV);
+
+addValidationEvent(creditCardInput, validateCreditNum);
+
+addValidationEvent(nameInput, validateName);
+
+
+// make a function to validate the activies
+
+
+function validateActivities(activitiesList) {
+  for (let i = 0; i < activitiesList.length; i++) {
+    if (activitiesList[i].checked) {
+      return true
+    }
+  }
+  return false
+}
+
+// add an event listener so when something is checked the red border
+// goes away
+
+schedule.addEventListener("change", (e) => {
+  if (e.target.checked) {
+    schedule.style.border = "";
+  }
+});
