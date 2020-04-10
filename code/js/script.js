@@ -240,8 +240,6 @@ function checkSchedule(event) {
       }
     }
   }
-  console.log(event.dataset.dayAndTime, eventName)
-
 }
 
 
@@ -274,22 +272,29 @@ paypal.style.display = "none";
 // add an event listener to payment select <option>
 
 const payment = document.getElementById('payment');
+payment.selectedIndex = 1;
 
 payment.addEventListener('change', (event) => {
   if (event.target.value === "credit card" || event.target.value === "select method") {
     paypal.style.display = "none";
     bitcoin.style.display = "none"
     creditCard.style.display = "block";
+    // change option to select payment method
+    payment.selectedIndex = 1;
   }
   else if (event.target.value === "paypal") {
     creditCard.style.display = "none";
     bitcoin.style.display = "none";
     paypal.style.display = "block";
+    // change payment option to select payment method
+    payment.selectedIndex = 2;
   }
   else {
     creditCard.style.display = "none";
     paypal.style.display = "none";
     bitcoin.style.display = "block";
+    // change payment option to select payment method
+    payment.selectedIndex = 3;
   }
 });
 
@@ -316,12 +321,14 @@ submitButton.addEventListener('click', (e) => {
     }
   }
     else {
-      if (validateEmail(mailInput.value) &&validateName(nameInput.value)) {
+      if (validateEmail(mailInput.value) && validateName(nameInput.value)
+      && validateActivities(activities)) {
         window.location.reload();
       }
       else {
         createRedBorder(validateEmail, mailInput);
         createRedBorder(validateName, nameInput);
+        scheduleRedBorder(validateActivities, activities, schedule);
       }
     }
 });
@@ -351,7 +358,7 @@ function warningValidate() {
   createRedBorder(validateEmail, mailInput);
   createRedBorder(validateName, nameInput);
   createRedBorder(validateZip, zipInput);
-  scheduleRedBorder(validateActivities, activities, schedule)
+  scheduleRedBorder(validateActivities, activities, schedule);
  
 
 }
